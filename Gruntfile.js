@@ -1,34 +1,26 @@
 /*jshint node:true*/
 module.exports = function (grunt) {
 	'use strict';
-	grunt.initConfig({
-		/* Autoprefixer */
+	grunt.initConfig({ /* Autoprefixer */
 		autoprefixer: {
 			options: {
-				browsers: ['last 3 version', 'ie 8', 'ie 7']	
+				browsers: ['last 3 version', 'ie 8', 'ie 7']
 			},
 			single_file: {
 				src: 'css/index.css',
 				dest: 'css/index.prefixed.css'
 			}
 		},
-		borschik: {
-			options: {
-				minimize: true
-			},
-			css: {
-				src: ['css/index.prefixed.css'],
-				dest: ['css/index.min.css']
-			},
-			js: {
-				src: ['js/geo.js'],
-				dest: ['js/geo.min.js']
+		uglify: {
+			my_target: {
+				files: {
+					'js/source.min.js': ['js/geo.js', 'js/index.js']
+				}
 			}
 		}
 	});
 
-	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-autoprefixer');
-	grunt.loadNpmTasks('grunt-borschik');
-	grunt.registerTask('default', ['autoprefixer', 'borschik']);
+	grunt.loadNpmTasks('grunt-contrib-uglify');
+	grunt.registerTask('default', ['autoprefixer', 'uglify']);
 };
