@@ -3,7 +3,7 @@ function GeolocationService() {
 };
 GeolocationService.prototype = {
 	constructor: GeolocationService,
-	getLocation: function(options) {
+	getLocation: function (options) {
 		if (navigator.geolocation) {
 			navigator.geolocation.getCurrentPosition(ymaps.util.bind(this._onGeolocationSuccess, this), ymaps.util.bind(this._onGeolocationError, this), options);
 		} else {
@@ -11,16 +11,16 @@ GeolocationService.prototype = {
 		}
 		return this._sync();
 	},
-	_sync: function(p) {
+	_sync: function (p) {
 		var promise = new ymaps.util.Promise();
-		this._location.then(function(res) {
+		this._location.then(function (res) {
 			promise.resolve(res);
-		}, function(err) {
+		}, function (err) {
 			promise.reject(err);
 		});
 		return promise;
 	},
-	_onGeolocationSuccess: function(position) {
+	_onGeolocationSuccess: function (position) {
 		var coords = [position.coords.latitude, position.coords.longitude],
 			location = this._location,
 			locationData = {
@@ -32,33 +32,33 @@ GeolocationService.prototype = {
 				speed: position.coords.speed,
 				heading: position.coords.heading
 			};
-		this.getLocationData(coords).then(function(data) {
+		this.getLocationData(coords).then(function (data) {
 			location.resolve(ymaps.util.extend({
 				isHighAccuracy: true
 			}, locationData, data));
-		}, function(err) {
+		}, function (err) {
 			location.resolve(ymaps.util.extend({}, ymaps.geolocation, locationData, {
 				isHighAccuracy: true
 			}));
 		});
 	},
-	_onGeolocationError: function(error) {
+	_onGeolocationError: function (error) {
 		if (window.console) {
 			console.log(error.message || this.constructor.GEOLOCATION_ERRORS[error + 1]);
 		}
 		this._location.resolve(this.getLocationByIP() || this.getDefaults());
 	},
-	getLocationByIP: function() {
+	getLocationByIP: function () {
 		return ymaps.geolocation;
 	},
-	getLocationData: function(coords) {
+	getLocationData: function (coords) {
 		var promise = new ymaps.util.Promise(),
 			mapSize = this.getMapSize(),
 			search = ymaps.geocode(coords, {
 				results: 1,
 				kind: 'locality'
 			});
-		search.then(function(res) {
+		search.then(function (res) {
 			var result = res.geoObjects.get(0),
 				props = result.properties;
 			if (result) {
@@ -71,12 +71,12 @@ GeolocationService.prototype = {
 			} else {
 				promise.reject('Not found');
 			}
-		}, function(err) {
+		}, function (err) {
 			promise.reject(err);
 		});
 		return promise;
 	},
-	getDefaults: function() {
+	getDefaults: function () {
 		return {
 			latitude: 43.262734,
 			longitude: 76.927462,
@@ -87,55 +87,9 @@ GeolocationService.prototype = {
 			isHighAccuracy: false
 		};
 	},
-	getMapSize: function() {
+	getMapSize: function () {
 		return [800, 600];
 	}
 };
-GeolocationService.GEOLOCATION_ERRORS = ['permission denied', 'position unavailable', 'timeout'];
 
-function initMap() {
-	var myCoords;
-	ymaps.ready(function() {
-		var myMap, myMapContainer = document.getElementById('YMapsID'),
-			service = new GeolocationService(),
-			myLocation = service.getLocation({
-				enableHighAccuracy: true,
-				timeout: 10000,
-				maximumAge: 1000
-			});
-		myMap = new ymaps.Map('YMapsID', {
-			center: [43.263060, 76.927571],
-			zoom: 17
-		});
-		navigator.geolocation.getCurrentPosition(function(position) {});
-		ourOffice = new ymaps.Placemark([43.263060, 76.927571], {
-			iconContent: 'Офис ChocoFamily'
-		}, {
-			preset: 'twirl#redStretchyIcon',
-			balloonCloseButton: false,
-			hideIconOnBalloonOpen: false
-		});
-		myMap.geoObjects.add(ourOffice);
-		myMap.controls.add(new ymaps.control.SmallZoomControl());
-		service.getMapSize = function() {
-			return [myMapContainer.width(), myMapContainer.height()];
-		};
-		document.getElementById('route').style.display = 'block';
-		document.getElementById('route').onclick = function() {
-			myLocation.then(function(loc) {
-				myCoords = [loc.latitude, loc.longitude]
-				ymaps.route([myCoords, [43.263060, 76.927571]], {
-					mapStateAutoApply: true,
-					avoidTrafficJams: true
-				}).then(function(route) {
-					route.getPaths().options.set({
-						balloonContenBodyLayout: ymaps.templateLayoutFactory.createClass('$[properties.humanJamsTime]'),
-						strokeColor: 'C0392B',
-						opacity: 0.9
-					});
-					myMap.geoObjects.add(route);
-				});
-			});
-		}
-	});
-};
+GeolocationService.GEOLOCATION_ERRORS = ['permission denied', 'position unavailable', 'timeout'];
