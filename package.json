@@ -1,0 +1,15 @@
+{
+	"name": "choco-office",
+	"version": "0.0.1",
+	"private": true,
+	"dependencies": {
+		"grunt": "0.4.2",
+		"grunt-contrib-watch": "0.5.3",
+		"grunt-borschik": "0.1.4",
+		"grunt-autoprefixer": "0.4.1"
+	},
+	"engines": {
+		"node": "0.10.x",
+		"npm": "1.3.x"
+	}
+}
